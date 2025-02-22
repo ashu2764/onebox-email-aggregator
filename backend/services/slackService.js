@@ -1,26 +1,18 @@
-import { WebClient } from '@slack/web-api';
-import dotenv from 'dotenv';
+import axios from 'axios';
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
-const slackClient = new WebClient(process.env.SLACK_BOT_TOKEN);
-const slackChannel = process.env.SLACK_CHANNEL_ID;
+ const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
 
 export const sendSlackNotification = async (email) => {
     try {
-        if (!email || !email.from || !email.subject || !email.text) {
-            throw new Error('Invalid email data');
-        }
-
-        const message = `📧 *New Interested Email*\n\n*From:* ${email.from}\n*Subject:* ${email.subject}\n*Message:* ${email.text}`;
-
-        await slackClient.chat.postMessage({
-            channel: slackChannel,
-            text: message
-        });
-
+        const message = {
+            text: `📩 *New Interested Email*\n\n*Subject:* ${email.subject || 'No Subject'}\n*Message:* ${email.text.substring(0, 100)}...`
+        };
+        await axios.post(SLACK_WEBHOOK_URL, message);
         console.log('Slack notification sent.');
     } catch (error) {
-        console.error('Error sending Slack notification:', error);
+        console.error('Failed to send Slack notification:', error.message);
     }
 };

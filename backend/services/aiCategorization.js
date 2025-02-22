@@ -1,5 +1,7 @@
 import genAI from '../config/geminiClient.js';
 import esClient from '../config/elasticsearchClient.js';
+import { sendSlackNotification } from './slackService.js';
+import { triggerWebhook } from './webhookService.js';
 
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
@@ -68,6 +70,12 @@ export const categorizeAndStoreEmail = async (email) => {
         });
 
         console.log(`Email categorized as: ${category}`);
+        // Send Slack notification & trigger webhook if email is "Interested"
+       
+            await sendSlackNotification(email);
+            await triggerWebhook(email);
+        
+
         return category;
     } catch (error) {
         console.error('Categorization failed:', error);

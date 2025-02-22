@@ -3,12 +3,7 @@ import pool from '../config/db.js'; // Import the PostgreSQL pool
 
 const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-/**
- * Generates a suggested reply for the given email text.
- * @param {string} emailText - The content of the email.
- * @returns {Promise<string>} - The suggested reply.
- * @throws {Error} - If emailText is missing or invalid.
- */
+
 export const generateSuggestedReply = async (emailText) => {
   if (!emailText || typeof emailText !== 'string') {
     throw new Error('Email text is required and must be a valid string.');
@@ -31,11 +26,7 @@ Email: "${emailText}"`;
   }
 };
 
-/**
- * Stores knowledge text in the database.
- * @param {string} text - The knowledge text to store.
- * @throws {Error} - If text is missing or invalid.
- */
+
 export const storeKnowledge = async (text) => {
   if (!text || typeof text !== 'string') {
     throw new Error('Text is required and must be a valid string.');
