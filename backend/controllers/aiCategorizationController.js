@@ -9,13 +9,25 @@ export const categorizeEmailManually = async (req, res) => {
             return res.status(400).json({ error: 'Message ID is required' });
         }
 
-        const email = await esClient.get({ index: 'emails', id: messageId });
+        // Fetch email from Elasticsearch
+        const emailResponse = await esClient.get({ index: 'emails', id: messageId });
 
-        if (!email.found) {
-            return res.status(404).json({ error: 'Email not found' });
+        console.log("Fetched email from Elasticsearch:", emailResponse);
+
+        // Validate email data
+        if (!emailResponse.found || !emailResponse._source.text) {
+            return res.status(400).json({ error: 'Invalid email data' });
         }
 
-        const category = await categorizeAndStoreEmail(email._source);
+        // Ensure messageId is included in email data
+        const email = {
+            ...emailResponse._source,
+            messageId: emailResponse._id // Assign Elasticsearch document ID as messageId
+        };
+
+        // Categorize and store the email
+        const category = await categorizeAndStoreEmail(email);
+
         res.json({ message: 'Email categorized', category });
     } catch (error) {
         console.error('Error categorizing email:', error);
