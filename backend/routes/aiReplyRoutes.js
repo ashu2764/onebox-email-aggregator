@@ -1,8 +1,9 @@
-import express from "express";
-import { aiReplyHandler } from "../controllers/aiReplyController.js";
+import express from 'express';
+import { suggestReply, addKnowledge } from '../controllers/aiReplyController.js';
 
 const router = express.Router();
 
-router.post("/generate-reply", aiReplyHandler);
+router.post('/suggest', suggestReply);
+router.post('/add-knowledge', addKnowledge);
 
 export default router;
