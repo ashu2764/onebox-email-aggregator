@@ -28,10 +28,23 @@ export const getAllEmails = async (req, res) => {
 
         const { hits } = await esClient.search(searchParams);
 
-        const emails = hits.hits.map(hit => ({
-            id: hit._id,
-            ...hit._source,
-        }));
+        const emails = hits.hits.map(hit => {
+            let formattedDate = null;
+
+            // Ensure date exists and is valid before parsing
+            if (hit._source.date && typeof hit._source.date === "string") {
+                const parsedDate = new Date(hit._source.date);
+                if (!isNaN(parsedDate.getTime())) {
+                    formattedDate = parsedDate.toISOString(); 
+                }
+            }
+
+            return {
+                id: hit._id,
+                ...hit._source,
+                date: formattedDate || null
+            };
+        });
 
         res.json(emails);
     } catch (error) {

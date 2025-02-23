@@ -4,6 +4,6 @@ import { getAllEmails, syncEmails } from '../controllers/emailControllers.js';
 const router = express.Router();
 
 router.get('/sync', syncEmails);
-router.get("/emails", getAllEmails); 
+router.get("/emails", getAllEmails);
 
 export default router;

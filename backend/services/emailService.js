@@ -40,7 +40,8 @@ const connectToImap = async (config) => {
 const fetchAndStoreEmails = async (connection) => {
     try {
         const sinceDate = new Date();
-        sinceDate.setDate(sinceDate.getDate() - 30);
+        sinceDate.setUTCDate(sinceDate.getUTCDate() - 30);
+        sinceDate.setUTCHours(0, 0, 0, 0);
 
         const searchCriteria = [['SINCE', sinceDate.toISOString().split('T')[0]]];
         const fetchOptions = { bodies: ['HEADER', 'TEXT'], struct: true };
@@ -51,13 +52,19 @@ const fetchAndStoreEmails = async (connection) => {
             const email = await simpleParser(item.parts.find(part => part.which === 'TEXT').body);
 
             const emailData = {
-                messageId: email.messageId,
-                from: email.from?.text,
-                to: email.to?.text,
-                subject: email.subject,
-                text: email.text,
-                date: email.date,
+                messageId: email.messageId || null,
+                from: email.from?.text || "Unknown",
+                to: email.to?.text || "Unknown",
+                subject: email.subject || "No Subject",
+                text: email.text || "",
+                date: email.date ? new Date(email.date).toISOString() : null
             };
+
+            // Ensure essential fields are not missing
+            if (!emailData.messageId || !emailData.text.trim()) {
+                console.error("Skipping email: Missing required fields", emailData);
+                return;  // Skip this email and prevent error
+            }
 
             await esClient.index({
                 index: 'emails',

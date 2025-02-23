@@ -20,7 +20,7 @@ export const categorizeEmail = async (emailText) => {
 
     const prompt = `Categorize the following email into one of these labels: ${CATEGORY_LABELS.join(', ')}.
 Email: "${emailText}"
-Response format (valid JSON only): {"category": "LABEL_NAME"}`;
+Response format (valid JSON only): {"category": "LABEL_NAME"};`;
 
     const response = await model.generateContent(prompt);
 
